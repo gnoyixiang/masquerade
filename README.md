@@ -52,4 +52,6 @@ GitHub secrets.
 
 The extension uses Chrome's documented [declarativeNetRequest API](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest), [Debugger API](https://developer.chrome.com/docs/extensions/reference/api/debugger), [permission model](https://developer.chrome.com/docs/extensions/develop/concepts/declare-permissions), [MV3 CSP](https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy), and [Tabs API](https://developer.chrome.com/docs/extensions/reference/api/tabs).
 
-Privacy policy: [docs/privacy-policy.md](docs/privacy-policy.md).
+Privacy policy source: [site/privacy-policy.html](site/privacy-policy.html). Once
+GitHub Pages is enabled for the Pages workflow, the public policy URL is
+`https://gnoyixiang.github.io/masquerade/privacy-policy.html`.

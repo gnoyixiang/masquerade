@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masquerade Privacy Policy</title>
+  <style>
+    :root { color-scheme: light dark; font: 16px/1.6 system-ui, sans-serif; }
+    body { margin: 0; background: #f6f7f9; color: #202124; }
+    main { box-sizing: border-box; max-width: 760px; margin: 3rem auto; padding: 2.5rem; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px #0001; }
+    h1 { line-height: 1.2; }
+    h2 { margin-top: 2rem; line-height: 1.3; }
+    code { padding: .1rem .3rem; background: #eef0f3; border-radius: 4px; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #202124; color: #e8eaed; }
+      main { background: #292a2d; box-shadow: 0 4px 24px #0006; }
+      code { background: #3c4043; }
+      a { color: #8ab4f8; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Masquerade Privacy Policy</h1>
+    <p><strong>Effective date:</strong> 2026-09-02</p>
+
+    <p>Masquerade is a local-only Chrome extension for testing how websites respond to different User-Agent identities. This policy explains what Masquerade handles when you install and use it.</p>
+
+    <h2>Data we collect</h2>
+    <p>Masquerade does not collect, transmit, sell, or share personal information, browsing history, page content, cookies, credentials, form data, or analytics. It does not operate a remote service and does not use advertising or tracking.</p>
+
+    <h2>Data stored locally</h2>
+    <p>Masquerade stores the selected User-Agent, custom User-Agent draft, and the Network Override and Full Tab Spoof toggle states in Chrome's local extension storage. This information remains on your device and is used only to provide the extension's features. You can remove it by uninstalling the extension or clearing its extension storage in Chrome.</p>
+
+    <h2>Permissions and host access</h2>
+    <ul>
+      <li><code>storage</code> stores the extension preferences described above locally.</li>
+      <li><code>declarativeNetRequestWithHostAccess</code> applies the selected User-Agent and best-effort Client Hint request-header changes when Network Override is enabled.</li>
+      <li><code>http://*/*</code> and <code>https://*/*</code> host access lets those request-header changes apply across normal HTTP(S) websites. Masquerade does not read, record, or transmit the URLs, requests, responses, or page content involved.</li>
+      <li><code>debugger</code> is used only when Full Tab Spoof is explicitly enabled for the current tab. Masquerade sends Chrome DevTools Protocol's <code>Network.setUserAgentOverride</code> command to that tab and does not inspect its DOM, JavaScript, cookies, credentials, request bodies, or response bodies.</li>
+    </ul>
+
+    <h2>Remote code</h2>
+    <p>All Masquerade JavaScript is included in the extension package. Masquerade does not load or execute remote JavaScript or WebAssembly.</p>
+
+    <h2>Changes and contact</h2>
+    <p>This policy may be updated when Masquerade's data practices change. The current version is maintained in the <a href="https://github.com/gnoyixiang/masquerade">Masquerade GitHub repository</a>. For questions, please open an issue in that repository.</p>
+  </main>
+</body>
+</html>
