@@ -53,6 +53,7 @@ jobs:
   publish:
     name: Upload and submit for review
     needs: validate
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: chrome-web-store
