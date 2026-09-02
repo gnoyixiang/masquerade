@@ -2,6 +2,12 @@ name: Publish to Chrome Web Store
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Submit the validated package to the Chrome Web Store
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -53,7 +59,7 @@ jobs:
   publish:
     name: Upload and submit for review
     needs: validate
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && inputs.publish == true
     runs-on: ubuntu-latest
     environment:
       name: chrome-web-store

@@ -2,9 +2,11 @@
 
 Masquerade's `Publish to Chrome Web Store` workflow is manual. It first runs
 the same test, build, package, zip-integrity, and JavaScript syntax checks as
-CI. Only a successful validation job can reach the publish job. The publish job
-uses the `chrome-web-store` GitHub Environment, so configure required reviewers
-there if publishing should require an approval.
+CI. Only a successful validation job can reach the publish job, and the publish
+job also requires explicitly choosing the `publish` workflow input. The default
+is `false`, which makes it possible to run validation and download the package
+without publishing. The publish job uses the `chrome-web-store` GitHub
+Environment, so configure required reviewers there for a second approval gate.
 
 The workflow uploads `masquerade.zip` to an existing Chrome Web Store item and
 calls the Chrome Web Store API v2 `publish` method. That submits the item for
@@ -88,7 +90,8 @@ access token for the v2 upload and publish calls.
 1. Merge the intended version to `main` and confirm the validation workflow is
    green.
 2. Open **Actions → Publish to Chrome Web Store → Run workflow**, select
-   `main`, and start it.
+   `main`, set `publish` to `true`, and start it. Leave `publish` as `false` if
+   you only want to validate and download the package artifact.
 3. Approve the `chrome-web-store` environment deployment when GitHub pauses for
    review.
 4. Check the workflow log for the successful upload and the message that the
