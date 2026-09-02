@@ -1,0 +1,44 @@
+name: Build and validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Test, build, and package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run build validation
+        run: npm run build
+
+      - name: Create release package
+        run: npm run package
+
+      - name: Validate package contents
+        run: unzip -t masquerade.zip
+
+      - name: Check JavaScript syntax
+        run: node --check background.js && node --check ua-utils.js && node --check presets.js && node --check popup.js
+
+      - name: Keep generated package out of git
+        run: git check-ignore --quiet masquerade.zip

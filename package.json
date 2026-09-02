@@ -1,0 +1,11 @@
+{
+  "name": "masquerade-chrome-extension",
+  "version": "1.2.2",
+  "private": true,
+  "description": "A dependency-free Manifest V3 User-Agent switcher for Chrome.",
+  "scripts": {
+    "test": "node test/validate.mjs",
+    "build": "npm test",
+    "package": "node test/package.mjs"
+  }
+}

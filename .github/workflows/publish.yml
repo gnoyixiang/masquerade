@@ -1,0 +1,130 @@
+name: Publish to Chrome Web Store
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chrome-web-store-publish
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run build validation
+        run: npm run build
+
+      - name: Create release package
+        run: npm run package
+
+      - name: Validate package contents
+        run: unzip -t masquerade.zip
+
+      - name: Check JavaScript syntax
+        run: node --check background.js && node --check ua-utils.js && node --check presets.js && node --check popup.js
+
+      - name: Check generated package is ignored
+        run: git check-ignore --quiet masquerade.zip
+
+      - name: Pass package to publish job
+        uses: actions/upload-artifact@v4
+        with:
+          name: masquerade-package
+          path: masquerade.zip
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    name: Upload and submit for review
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: chrome-web-store
+
+    steps:
+      - name: Download validated package
+        uses: actions/download-artifact@v4
+        with:
+          name: masquerade-package
+
+      - name: Upload and publish package
+        env:
+          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+          CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
+          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+        run: |
+          set -euo pipefail
+
+          item_name="publishers/${CWS_PUBLISHER_ID}/items/${CWS_EXTENSION_ID}"
+          item_url="https://chromewebstore.googleapis.com/v2/${item_name}"
+          upload_url="https://chromewebstore.googleapis.com/upload/v2/${item_name}:upload"
+
+          token_response="$(curl --fail-with-body --silent --show-error \
+            --request POST 'https://oauth2.googleapis.com/token' \
+            --data-urlencode "client_id=${CWS_CLIENT_ID}" \
+            --data-urlencode "client_secret=${CWS_CLIENT_SECRET}" \
+            --data-urlencode 'grant_type=refresh_token' \
+            --data-urlencode "refresh_token=${CWS_REFRESH_TOKEN}")"
+          access_token="$(jq --exit-status --raw-output '.access_token // empty' <<<"${token_response}")"
+          test -n "${access_token}"
+
+          upload_response="$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${access_token}" \
+            --header 'Content-Type: application/zip' \
+            --upload-file masquerade.zip \
+            "${upload_url}")"
+          upload_state="$(jq --raw-output '.uploadState // empty' <<<"${upload_response}")"
+
+          if [ "${upload_state}" = 'IN_PROGRESS' ]; then
+            for attempt in $(seq 1 20); do
+              sleep 15
+              status_response="$(curl --fail-with-body --silent --show-error \
+                --header "Authorization: Bearer ${access_token}" \
+                "${item_url}:fetchStatus")"
+              upload_state="$(jq --raw-output '.lastAsyncUploadState // empty' <<<"${status_response}")"
+
+              case "${upload_state}" in
+                SUCCEEDED) break ;;
+                FAILED|NOT_FOUND)
+                  echo "Chrome Web Store upload ended in ${upload_state}."
+                  exit 1
+                  ;;
+              esac
+
+              if [ "${attempt}" -eq 20 ]; then
+                echo 'Timed out waiting for Chrome Web Store upload processing.'
+                exit 1
+              fi
+            done
+          elif [ "${upload_state}" != 'SUCCEEDED' ]; then
+            echo "Chrome Web Store upload returned unexpected state: ${upload_state:-unknown}."
+            exit 1
+          fi
+
+          publish_response="$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${access_token}" \
+            "${item_url}:publish")"
+          echo 'Chrome Web Store publish request submitted for review.'
+          if [ -n "${publish_response}" ]; then
+            jq . <<<"${publish_response}"
+          fi
