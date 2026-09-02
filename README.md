@@ -51,3 +51,5 @@ Web Store and submits it for review. See
 GitHub secrets.
 
 The extension uses Chrome's documented [declarativeNetRequest API](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest), [Debugger API](https://developer.chrome.com/docs/extensions/reference/api/debugger), [permission model](https://developer.chrome.com/docs/extensions/develop/concepts/declare-permissions), [MV3 CSP](https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy), and [Tabs API](https://developer.chrome.com/docs/extensions/reference/api/tabs).
+
+Privacy policy: [docs/privacy-policy.md](docs/privacy-policy.md).
